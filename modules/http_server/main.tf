@@ -42,3 +42,31 @@ resource "google_compute_instance" "http_server" {
   # Apply the firewall rule to allow external IPs to access this instance
   tags = ["http-server"]
 }
+
+
+
+resource "google_compute_instance" "http_server2" {
+  project      = "${var.project}"
+  zone         = "us-east1-a"
+  name         = "${local.network}-apache2-custom"
+  machine_type = "e2-standard"
+
+  metadata_startup_script = "sudo apt-get update && sudo apt-get install apache2 -y && echo '<html><body><h1>Environment: custom</h1></body></html>' | sudo tee /var/www/html/index.html"
+
+  boot_disk {
+    initialize_params {
+      image = "debian-cloud/debian-9"
+    }
+  }
+
+  network_interface {
+    subnetwork = "${var.subnet}"
+
+    access_config {
+      # Include this section to give the VM an external ip address
+    }
+  }
+
+  # Apply the firewall rule to allow external IPs to access this instance
+  tags = ["http-server"]
+}
